@@ -1,11 +1,32 @@
+import os
 
-
+from libtestgui import dialogs
 
 def read(parent):
 
 	# ***** [DISPLAY] Section *****
 
 	parent.jog_increments = parent.inifile.find('DISPLAY', 'INCREMENTS') or False
+
+	# ***** [FLEXGUI] Section *****
+
+	# check for a RESOURCES file
+	parent.resources_file = parent.inifile.find('FLEXGUI', 'RESOURCES') or False
+	if parent.resources_file:
+		if not os.path.exists(os.path.join(parent.config_path, parent.resources_file)):
+			msg = (f'The RESOURCES file {parent.resources_file}\n'
+				'Was not found. Resourses can not be imported')
+			dialogs.warn_msg_ok(parent, msg, 'INI Configuration ERROR!')
+			parent.resources_file = False
+
+	# check for QSS file
+	parent.qss_file = parent.inifile.find('FLEXGUI', 'QSS') or False
+	if parent.qss_file:
+		if not os.path.exists(os.path.join(parent.config_path, parent.qss_file)):
+			msg = (f'The QSS file {parent.qss_file}\n'
+				'Was not found. QSS can not be applied')
+			dialogs.warn_msg_ok(parent, msg, 'INI Configuration ERROR!')
+			parent.qss_file = False
 
 
 	# ***** [KINS] Section *****

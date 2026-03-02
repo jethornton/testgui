@@ -50,7 +50,29 @@ class testgui(QMainWindow):
 			gui_path = os.path.join(os.path.dirname(self.status.ini_filename), gui_file)
 			loadUi(gui_path, self)
 
+		# read the ini settings
 		readini.read(self)
+
+		# check for a resources.py file with images for the stylesheet
+		if self.resources_file: # import the resources file
+			try:
+				sys.path.append(self.config_path)
+				import resources
+			except:
+				msg = (f'The resources file {resources_file} was\n'
+					'not found, check for file name resources.py.')
+				dialogs.warn_msg_ok(parent, msg, 'Import Failed')
+
+		if self.qss_file: # use a local qss file
+			stylesheet = os.path.join(self.config_path, self.qss_file)
+			if os.path.isfile(stylesheet):
+				with open(stylesheet, 'r') as f:
+					self.setStyleSheet(f.read())
+			else:
+				msg = (f'The Stylesheet {stylesheet}\n'
+					'was not found.')
+				dialogs.warn_msg_ok(parent, msg, 'INI Error')
+
 		startup.find_children(self)
 		startup.setup_vars(self)
 		startup.setup_status(self)
