@@ -1,7 +1,7 @@
 debian/.debhelper
 debian/files
-debian/testgui/*
+debian/testgui*
 debian/debhelper-build-stamp
 *.bak
 *halshow.preferences
-.DS_Store
+
