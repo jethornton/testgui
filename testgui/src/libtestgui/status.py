@@ -264,6 +264,17 @@ def update(parent):
 		rounding = value[3]
 		getattr(parent, key).setText(f'{round(stat, rounding):.{value[2]}f}')
 
+	# update multi state labels
+	# key is label name and value[0] is the pin name
+	for key, value in parent.hal_ms_labels.items():
+		state = hal.get_value(f'flexhal.{value[0]}')
+		if state < len(value[1]):
+			getattr(parent, key).setText(f'{value[1][state]}')
+		else:
+			getattr(parent, key).setText('Value Error')
+
+
+
 	# handle errors
 	error = parent.error.poll()
 	if error:

@@ -322,6 +322,10 @@ def setup_hal(parent):
 		elif child.property('function') == 'hal_avr_f':
 			if isinstance(child, QLabel):
 				hal_avr_float_labels.append(child)
+		elif child.property('function') == 'hal_msl':
+			if isinstance(child, QLabel):
+				hal_multi_state_labels.append(child)
+
 
 	##### HAL LABEL #####
 	if len(hal_labels) > 0:
@@ -441,26 +445,22 @@ def setup_hal(parent):
 
 			parent.hal_avr_float[label_name] = [pin_name, deque([0], maxlen=s), p, r]
 
-	for key, value in parent.hal_avr_float.items():
-		print(key, value)
-
 	# FIXME add hal_avr_i_labels
 	##### HAL AVERAGE INT LABEL #####
 	# parent.hal_avr_int = {}
 
-
 	##### HAL MULTI STATE LABEL #####
 	if len(hal_multi_state_labels) > 0:
 		for label in hal_multi_state_labels:
-			msl_name = label.objectName()
+			label_name = label.objectName()
 			pin_name = label.property('pin_name')
 
 			if pin_name in [None, '']:
 				label.setEnabled(False)
-				msg = (f'HAL MULTI STATE LABEL {msl_name}\n'
+				msg = (f'HAL MULTI STATE LABEL {name}\n'
 				'pin name is blank or missing\n'
 				'The HAL pin can not be created.\n'
-				f'The {msl_name} will be disabled.')
+				f'The {name} will be disabled.')
 				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
 				continue
 
@@ -474,12 +474,12 @@ def setup_hal(parent):
 
 			if label.property('text_0') == None:
 				label.setEnabled(False)
-				msg = (f'HAL MULTI STATE LABEL {msl_name}\n'
+				msg = (f'HAL MULTI STATE LABEL {label_name}\n'
 				'text_0 Dynamic Property is blank or missing\n'
 				'A HAL MULTI STATE LABEL requires at least\n'
 				'one text message to display starting with\n'
 				'text_0. The HAL pin can not be created.\n'
-				f'The {msl_name} will be disabled.')
+				f'The {name} will be disabled.')
 				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
 				continue
 
@@ -495,8 +495,10 @@ def setup_hal(parent):
 				if text is not None:
 					text_list.append(text)
 				i += 1
-			parent.hal_ms_labels[msl_name] = [pin_name, text_list]
+			parent.hal_ms_labels[label_name] = [pin_name, text_list]
 
+	for key, value in parent.hal_ms_labels.items():
+		print(key, value)
 
 def setup_tools(parent):
 	pass
