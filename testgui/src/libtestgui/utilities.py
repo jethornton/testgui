@@ -101,6 +101,29 @@ def update_mdi(parent):
 				f.write('\n'.join(mdi_codes))
 		parent.mdi_command_le.setText('')
 
+def home_all_check(parent):
+	parent.status.poll()
+	for i in range(parent.status.joints):
+		if parent.inifile.find(f'JOINT_{i}', 'HOME_SEQUENCE') is None:
+			return False
+	return True
+
+def update_home_controls(parent):
+	parent.home_all = False
+	parent.status.poll()
+	for joint in range(parent.joints):
+		if parent.status.joint[joint]['homed']:
+			if f'home_pb_{joint}' in parent.child_names:
+				getattr(parent, f'home_pb_{joint}').setEnabled(False)
+			if f'unhome_pb_{joint}' in parent.child_names:
+				getattr(parent, f'unhome_pb_{joint}').setEnabled(True)
+	if all(parent.status.homed[:parent.joints]):
+		parent.home_all_pb.setEnabled(False)
+		if 'unhome_all_pb' in parent.child_names:
+			parent.unhome_all_pb.setEnabled(True)
+
+
+
 
 
 

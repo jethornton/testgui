@@ -77,6 +77,16 @@ class testgui(QMainWindow):
 					'was not found.')
 				dialogs.warn_msg_ok(parent, msg, 'INI Error')
 
+		# get emc states
+		self.exec_state = self.status.exec_state
+		self.interp_state = self.status.interp_state
+		self.interpreter_errcode = self.status.interpreter_errcode
+		self.motion_mode = self.status.motion_mode
+		self.motion_type = self.status.motion_type
+		self.state = self.status.state
+		self.task_mode = self.status.task_mode
+		self.task_state = self.status.task_state
+
 		startup.find_children(self)
 		startup.setup_vars(self)
 		startup.setup_status(self)
@@ -88,18 +98,6 @@ class testgui(QMainWindow):
 		startup.setup_jog(self)
 		startup.setup_plot(self)
 		startup.setup_hal(self)
-
-		# get emc states
-		self.exec_state = self.status.exec_state
-		self.interp_state = self.status.interp_state
-		self.interpreter_errcode = self.status.interpreter_errcode
-		self.motion_mode = self.status.motion_mode
-		self.motion_type = self.status.motion_type
-		self.state = self.status.state
-		self.task_mode = self.status.task_mode
-		self.task_state = self.status.task_state
-
-
 
 		# setup and start the status update timer every 0.01 second
 		self.update_timer = QTimer()

@@ -83,6 +83,8 @@ def update(parent):
 		if parent.status.motion_mode == emc.TRAJ_MODE_TELEOP:
 			for item in parent.homed_enabled:
 				getattr(parent, item).setEnabled(True)
+			if parent.home_all:
+				utilities.update_home_controls(parent)
 		else:
 			for item in parent.homed_enabled:
 				getattr(parent, item).setEnabled(False)

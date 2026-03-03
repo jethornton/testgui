@@ -18,6 +18,16 @@ def home(parent):
 		if f'unhome_pb_{joint}' in parent.child_names:
 			getattr(parent, f'unhome_pb_{joint}').setEnabled(True)
 
+def home_all(parent):
+	parent.status.poll()
+	if parent.status.task_mode != emc.MODE_MANUAL:
+		parent.command.mode(emc.MODE_MANUAL)
+		parent.command.wait_complete()
+	parent.command.teleop_enable(False)
+	parent.command.wait_complete()
+	parent.command.home(-1)
+	parent.home_all = True
+
 def unhome(parent):
 	parent.status.poll()
 	joint = int(parent.sender().objectName()[-1])
@@ -32,6 +42,13 @@ def unhome(parent):
 		parent.sender().setEnabled(False)
 		if f'home_pb_{joint}' in parent.child_names:
 			getattr(parent, f'home_pb_{joint}').setEnabled(True)
+		parent.status.poll()
+		print(parent.status.homed)
+		if not any(parent.status.homed):
+			if 'home_all_pb' in parent.child_names:
+				parent.home_all_pb.setEnabled(True)
+			if 'unhome_all_pb' in parent.child_names:
+				parent.unhome_all_pb.setEnabled(False)
 
 def run_mdi(parent):
 	mdi_command = parent.mdi_command_le.text()

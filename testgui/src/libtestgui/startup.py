@@ -46,6 +46,7 @@ def find_children(parent): # get the object names of all widgets
 def setup_vars(parent):
 	parent.program_units = False
 	parent.g_codes = ()
+	parent.home_all = False
 
 def setup_enables(parent):
 
@@ -131,6 +132,9 @@ def setup_enables(parent):
 			parent.state_on_enabled.append(f'jog_minus_pb_{i}')
 		if f'home_pb_{i}' in parent.child_names:
 			parent.state_on_enabled.append(f'home_pb_{i}')
+	if 'home_all_pb' in parent.child_names:
+		if utilities.home_all_check(parent):
+			parent.state_on_enabled.append('home_all_pb')
 
 def setup_status(parent):
 	# Actual Position labels no offsets
@@ -189,6 +193,22 @@ def setup_buttons(parent): # connect buttons to functions
 
 	if 'quit_pb' in parent.child_names:
 		parent.quit_pb.clicked.connect(partial(actions.action_quit, parent))
+
+	# disable home all if home sequence is not found
+	if 'home_all_pb' in parent.child_names:
+		if utilities.home_all_check(parent):
+			parent.home_all_pb.clicked.connect(partial(commands.home_all, parent))
+		else:
+			parent.home_all_pb.setEnabled(False)
+			msg = ('All joints must have the HOME_SEQUENCE set\n'
+			'in order for the Home All button to function.\n'
+			'The Home All button will be disabled.')
+			dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+			if 'home_all_pb' in parent.state_estop_disabled:
+				del parent.state_estop_disabled['home_all_pb']
+			if 'home_all_pb' in parent.state_estop_reset_disabled:
+				del parent.state_estop_reset_disabled['home_all_pb']
+
 
 	for i in range(9):
 		if f'home_pb_{i}' in parent.child_names:
@@ -497,8 +517,6 @@ def setup_hal(parent):
 				i += 1
 			parent.hal_ms_labels[label_name] = [pin_name, text_list]
 
-	for key, value in parent.hal_ms_labels.items():
-		print(key, value)
 
 def setup_tools(parent):
 	pass
