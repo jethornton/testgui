@@ -62,6 +62,7 @@ Offsets for G92
 HAL Labels
 HAL Average Float Labels
 HAL Multi State Labels
+HAL Checkbox, Button and Radio Button
 
 ** Miscellaneous Items **
 Error Viewer

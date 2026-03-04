@@ -1,6 +1,6 @@
 import re, os
 
-
+from libtestgui import dialogs
 
 def is_number(string):
 	try:
@@ -130,6 +130,46 @@ def update_home_controls(parent):
 			parent.home_all_pb.setEnabled(True)
 		if 'unhome_all_pb' in parent.child_names:
 			parent.unhome_all_pb.setEnabled(False)
+
+
+def set_hal_enables(parent, obj):
+	obj_name = obj.objectName()
+	always_on = obj.property('always_on')
+	state_on = obj.property('state_on')
+	all_homed = obj.property('all_homed')
+
+	match (always_on, state_on, all_homed):
+		case (True, None, None): # always on
+			return
+		case (None, True, None): # power on
+			parent.state_estop_disabled.append(obj_name)
+			parent.state_estop_reset_disabled.append(obj_name)
+			parent.state_on_enabled.append(obj_name)
+		case (None, None, True): # all homed
+			parent.state_estop_disabled.append(obj_name)
+			parent.state_estop_reset_disabled.append(obj_name)
+			parent.homed_enabled.append(obj_name)
+		case _: # normal enable/disable
+			parent.state_estop_disabled.append(obj_name)
+			parent.state_estop_reset_enabled.append(obj_name)
+
+def hal_confirm(parent):
+	sender = parent.sender()
+	text = sender.text()
+	checked_state = sender.isChecked()
+	pin = sender.property('pin_name')
+	#getattr(parent, f'{pin_name}')
+	msg = (f'The HAL object "{text}" requests\n'
+	'confirmation before changing the HAL\n'
+	f'state of the {pin} pin.')
+	result = dialogs.confirm_msg_ok_cancel(parent, msg, 'HAL')
+	#print(f'result {result}') self.hal_test['out'] = True
+	if result:
+		setattr(parent.halcomp, pin, checked_state)
+	else: # reset the checked state
+		sender.blockSignals(True)
+		sender.setChecked(not checked_state)
+		sender.blockSignals(False)
 
 
 

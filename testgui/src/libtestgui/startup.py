@@ -4,7 +4,8 @@ from functools import partial
 from collections import deque
 
 from PyQt6.QtWidgets import QWidget, QPushButton, QMenu, QListView
-from PyQt6.QtWidgets import QLabel
+from PyQt6.QtWidgets import QLabel, QAbstractSpinBox
+from PyQt6.QtWidgets import QAbstractButton, QCheckBox
 from PyQt6.QtWidgets import QVBoxLayout
 from PyQt6.QtGui import QAction
 
@@ -177,11 +178,6 @@ def setup_status(parent):
 			p = p if p is not None else parent.default_precision
 			parent.status_dro[f'{label}'] = [i, p] # add the label, tuple position & precision
 
-	#for key, value in parent.status_dro.items(): # key is label value list position & precision
-	#print(f'Machine Position {parent.status.position}')
-	#print(f'G5x Offset X {parent.status.g5x_offset}')
-	#print(f'G92 Offset X {parent.status.g92_offset}')
-
 def setup_buttons(parent): # connect buttons to functions
 	if 'estop_pb' in parent.child_names:
 		parent.estop_pb.toggled.connect(partial(actions.action_estop, parent))
@@ -233,7 +229,6 @@ def setup_actions(parent): # setup menu actions
 def setup_mdi(parent):
 	# mdi_command_le is required to run mdi commands
 	# run_mdi_pb and mdi_history_lw are optional
-	#if set(['mdi_command_le', 'run_mdi_pb']).issubset(set(parent.child_names)):
 
 	if 'mdi_command_le' in parent.child_names:
 		parent.mdi_command_le.returnPressed.connect(partial(commands.run_mdi, parent))
@@ -339,7 +334,9 @@ def setup_hal(parent):
 
 	for child in parent.findChildren(QWidget):
 		if child.property('function') == 'hal_pin':
-			if isinstance(child, QLabel):
+			if isinstance(child, QAbstractButton): # QCheckBox, QPushButton, QRadioButton, and QToolButton
+				hal_buttons.append(child)
+			elif isinstance(child, QLabel):
 				hal_labels.append(child)
 		elif child.property('function') == 'hal_avr_f':
 			if isinstance(child, QLabel):
@@ -347,6 +344,62 @@ def setup_hal(parent):
 		elif child.property('function') == 'hal_msl':
 			if isinstance(child, QLabel):
 				hal_multi_state_labels.append(child)
+
+	##### HAL BUTTON & CHECKBOX & RADIO BUTTON #####
+	if len(hal_buttons) > 0:
+		for button in hal_buttons:
+			button_name = button.objectName()
+			pin_name = button.property('pin_name')
+			if isinstance(button, QPushButton) or isinstance(button, QCheckBox):
+				confirm = button.property('confirm')
+			else:
+				confirm = False
+
+			if confirm and not button.isCheckable():
+				button.setEnabled(False)
+				msg = (f'The HAL Button {button_name}\n'
+				f'with the text {button.text()}\n'
+				'has confirm set but is not checkable\n'
+				f'The {button_name} button will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			if pin_name in [None, '']:
+				button.setEnabled(False)
+				msg = (f'The HAL Button {button_name}\n'
+				f'with the text {button.text()}\n'
+				'pin name is blank or missing\n'
+				'The HAL pin can not be created.\n'
+				f'The {button_name} button will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			if pin_name in dir(parent):
+				button.setEnabled(False)
+				msg = (f'HAL Button {button_name}\n'
+				f'pin name {pin_name}\n'
+				'is already used in Flex GUI\n'
+				'The HAL pin can not be created.\n'
+				f'The {button_name} button will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			hal_type = getattr(hal, 'HAL_BIT')
+			hal_dir = getattr(hal, 'HAL_OUT')
+			setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal_type, hal_dir))
+			pin = getattr(parent, f'{pin_name}')
+
+			if button.isCheckable() and not confirm:
+				button.toggled.connect(lambda checked, pin=pin: (pin.set(checked)))
+				# set the hal pin default
+				setattr(parent.halcomp, pin_name, button.isChecked())
+			elif button.isCheckable() and confirm:
+				button.toggled.connect(partial(utilities.hal_confirm, parent))
+			else:
+				button.pressed.connect(lambda pin=pin: (pin.set(True)))
+				button.released.connect(lambda pin=pin: (pin.set(False)))
+
+			utilities.set_hal_enables(parent, button)
 
 
 	##### HAL LABEL #####
