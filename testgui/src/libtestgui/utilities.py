@@ -171,6 +171,25 @@ def hal_confirm(parent):
 		sender.setChecked(not checked_state)
 		sender.blockSignals(False)
 
+def io_watch(parent):
+	for key, value in parent.hal_io_check.items():
+		checked_state = getattr(parent, key).isChecked()
+		hal_state = getattr(parent.halcomp, value)
+		if checked_state != hal_state:
+			getattr(parent, key).setChecked(hal_state)
+
+	for key, value in parent.hal_io_int.items():
+		int_value = getattr(parent, key).value()
+		hal_value = getattr(parent.halcomp, value)
+		if int_value != hal_value:
+			getattr(parent, key).setValue(hal_value)
+
+	for key, value in parent.hal_io_float.items():
+		float_value = getattr(parent, key).value()
+		hal_value = getattr(parent.halcomp, value)
+		if float_value != hal_value:
+			getattr(parent, key).setValue(hal_value)
+
 def update_hal_io(parent, value):
 	setattr(parent.halcomp, parent.sender().property('pin_name'), value)
 

@@ -588,8 +588,64 @@ def setup_hal(parent):
 			# pin = getattr(parent, f'{pin_name}')
 			parent.hal_progressbars[progressbar_name] = pin_name
 
-			for key, value in parent.hal_progressbars.items():
-				print(key, value)
+	##### HAL_IO #####
+	for child in parent.findChildren(QWidget):
+		if child.property('function') == 'hal_io':
+			child_name = child.objectName()
+			pin_name = child.property('pin_name')
+
+			if pin_name in [None, '']:
+				child.setEnabled(False)
+				msg = (f'The HAL I/O {child_name}\n'
+				f'pin name is blank or missing\n'
+				'The HAL pin can not be created.\n'
+				f'The {child_name} button will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			if isinstance(child, QCheckBox):
+				setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal.HAL_BIT, hal.HAL_IO))
+				child.stateChanged.connect(partial(utilities.update_hal_io, parent))
+				parent.hal_io_check[child_name] = pin_name
+
+			elif isinstance(child, QPushButton):
+				if child.isCheckable():
+					setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal.HAL_BIT, hal.HAL_IO))
+					child.toggled.connect(partial(utilities.update_hal_io, parent))
+					parent.hal_io_check[child_name] = pin_name
+				else:
+					child.setEnabled(False)
+					msg = (f'The QPushButton {child_name} must be\n'
+					'set to checkable to be a I/O button.\n'
+					'The QPushButton will be disabled.')
+					dialogs.error_msg_ok(parent, msg, 'Error')
+
+			elif isinstance(child, QRadioButton):
+				setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal.HAL_BIT, hal.HAL_IO))
+				child.toggled.connect(partial(utilities.update_hal_io, parent))
+				parent.hal_io_check[child_name] = pin_name
+
+			elif isinstance(child, QSpinBox) or isinstance(child, QSlider):
+				hal_type = child.property('hal_type')
+				if hal_type in ['HAL_S32', 'HAL_U32']:
+					hal_type = getattr(hal, f'{hal_type}')
+					setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal_type, hal.HAL_IO))
+					child.valueChanged.connect(partial(utilities.update_hal_io, parent))
+					parent.hal_io_int[child_name] = pin_name
+				else:
+					child.setEnabled(False)
+					msg = (f'The QSpinBox hal_type must be\n'
+					'set to HAL_S32 or HAL_U32.\n'
+					'The spinbox will be disabled')
+					dialogs.error_msg_ok(parent, msg, 'Error')
+
+			elif isinstance(child, QDoubleSpinBox):
+				setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal.HAL_FLOAT, hal.HAL_IO))
+				child.valueChanged.connect(partial(utilities.update_hal_io, parent))
+				parent.hal_io_float[child_name] = pin_name
+
+			utilities.set_hal_enables(parent, child)
+
 
 	##### HAL LABEL #####
 	if len(hal_labels) > 0:

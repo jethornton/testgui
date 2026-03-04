@@ -65,6 +65,7 @@ HAL Multi State Labels
 HAL Checkbox, Button and Radio Button
 HAL Spinbox, Double Spinbox, Slider
 HAL Progressbars
+HAL I/O
 
 ** Miscellaneous Items **
 Error Viewer

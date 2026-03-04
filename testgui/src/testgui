@@ -17,6 +17,7 @@ import hal
 from libtestgui import readini
 from libtestgui import startup
 from libtestgui import status
+from libtestgui import utilities
 
 class testgui(QMainWindow):
 	def __init__(self):
@@ -103,6 +104,11 @@ class testgui(QMainWindow):
 		self.update_timer = QTimer()
 		self.update_timer.timeout.connect(partial(status.update, self))
 		self.update_timer.start(10) # milliseconds
+
+		# setup the i/o watch timer
+		self.io_watch_timer = QTimer(self)
+		self.io_watch_timer.timeout.connect(partial(utilities.io_watch, self))
+		self.io_watch_timer.start(1000) # milliseconds
 
 		# set the screen size and position
 		if self.settings.contains('GUI/window_size'):
