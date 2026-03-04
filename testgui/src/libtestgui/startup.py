@@ -5,8 +5,8 @@ from collections import deque
 
 from PyQt6.QtWidgets import QWidget, QPushButton, QMenu, QListView
 from PyQt6.QtWidgets import QLabel, QSpinBox, QDoubleSpinBox, QSlider
-from PyQt6.QtWidgets import QAbstractButton, QCheckBox
-from PyQt6.QtWidgets import QVBoxLayout
+from PyQt6.QtWidgets import QAbstractButton, QCheckBox, QProgressBar
+from PyQt6.QtWidgets import QVBoxLayout, QLCDNumber
 from PyQt6.QtGui import QAction
 
 import hal
@@ -342,6 +342,10 @@ def setup_hal(parent):
 				hal_dbl_spinboxes.append(child)
 			elif isinstance(child, QSlider):
 				hal_sliders.append(child)
+			elif isinstance(child, QProgressBar):
+				hal_progressbar.append(child)
+			elif isinstance(child, QLCDNumber):
+				hal_lcds.append(child)
 			elif isinstance(child, QLabel):
 				hal_labels.append(child)
 		elif child.property('function') == 'hal_avr_f':
@@ -541,6 +545,51 @@ def setup_hal(parent):
 			#	if slider_name.startswith('probe_'): # don't enable it when power is on
 			#		parent.probe_controls.append(slider_name)
 
+	##### HAL PROGRESSBAR #####
+	if len(hal_progressbar) > 0:
+		valid_types = ['HAL_S32', 'HAL_U32']
+		for progressbar in hal_progressbar:
+			progressbar_name = progressbar.objectName()
+			pin_name = progressbar.property('pin_name')
+
+			if pin_name in [None, '']:
+				progressbar.setEnabled(False)
+				msg = (f'HAL PROGRESSBAR {progressbar_name}\n'
+				'pin name is blank or missing\n'
+				'The HAL pin can not be created.\n'
+				f'The {progressbar_name} will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			if pin_name in dir(parent):
+				progressbar.setEnabled(False)
+				msg = (f'HAL Label {progressbar_name}\n'
+				f'pin name {pin_name}\n'
+				'is already used in Flex GUI\n'
+				'The HAL pin can not be created.\n'
+				f'The {progressbar_name} will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+				continue
+
+			'''
+			hal_type = progressbar.property('hal_type')
+			if hal_type not in valid_types:
+				progressbar.setEnabled(False)
+				msg = (f'{hal_type} is not valid type for a HAL Progressbar\n'
+				'only HAL_S32 or HAL_U32 can be used. \n'
+				f'The {progressbar_name} progressbar will be disabled.')
+				dialogs.error_msg_ok(parent, msg, 'Configuration Error!')
+				continue
+			'''
+
+			hal_type = getattr(hal, 'HAL_U32')
+			hal_dir = getattr(hal, 'HAL_IN')
+			setattr(parent, f'{pin_name}', parent.halcomp.newpin(pin_name, hal_type, hal_dir))
+			# pin = getattr(parent, f'{pin_name}')
+			parent.hal_progressbars[progressbar_name] = pin_name
+
+			for key, value in parent.hal_progressbars.items():
+				print(key, value)
 
 	##### HAL LABEL #####
 	if len(hal_labels) > 0:
