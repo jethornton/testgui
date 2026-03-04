@@ -78,14 +78,6 @@ def update(parent):
 		#print(f'MOTION MODE: {MOTION_MODES[parent.status.motion_mode]}')
 		if 'motion_mode_lb' in parent.child_names: # update the label
 			parent.motion_mode_lb.setText(MOTION_MODES[parent.status.motion_mode])
-		changed = True
-
-		if parent.status.motion_mode == emc.TRAJ_MODE_TELEOP:
-			for item in parent.homed_enabled:
-				getattr(parent, item).setEnabled(True)
-		else:
-			for item in parent.homed_enabled:
-				getattr(parent, item).setEnabled(False)
 
 		parent.motion_mode = parent.status.motion_mode
 
@@ -94,7 +86,6 @@ def update(parent):
 		#print(f'MOTION TYPE: {MOTION_TYPES[parent.status.motion_type]}')
 		if 'motion_type_lb' in parent.child_names: # update the label
 			parent.motion_type_lb.setText(MOTION_TYPES[parent.status.motion_type])
-		changed = True
 
 		parent.motion_type = parent.status.motion_type
 
@@ -104,7 +95,7 @@ def update(parent):
 		#print(f'STATE: {STATES[parent.status.state]}')
 		if 'state_lb' in parent.child_names: # update the label
 			parent.state_lb.setText(STATES[parent.status.state])
-		changed = True
+
 		# this is needed for MDI commands that use motion
 		if parent.status.state == emc.RCS_DONE and parent.status.task_mode == emc.MODE_MDI:
 			parent.command.mode(emc.MODE_MANUAL)
@@ -118,7 +109,7 @@ def update(parent):
 		#print(f'TASK MODE: {TASK_MODES[parent.status.task_mode]}')
 		if 'task_mode_lb' in parent.child_names: # update the label
 			parent.task_mode_lb.setText(TASK_MODES[parent.status.task_mode])
-		changed = True
+
 		# this is needed for MDI commands that do not use motion
 		if parent.status.state == emc.RCS_DONE and parent.status.task_mode == emc.MODE_MDI:
 			parent.command.mode(emc.MODE_MANUAL)
@@ -132,7 +123,6 @@ def update(parent):
 		#print(f'TASK STATE: {TASK_STATES[parent.status.task_state]}')
 		if 'task_state_lb' in parent.child_names: # update the label
 			parent.task_state_lb.setText(TASK_STATES[parent.status.task_state])
-		changed = True
 
 		# estop open
 		if parent.status.task_state == emc.STATE_ESTOP:
@@ -160,14 +150,18 @@ def update(parent):
 
 		parent.task_state = parent.status.task_state
 
-	#if changed:
-		#pass
-		#print('*** End of Changes ***\n')
-
 	# test for change to homed status
 	if parent.homed != parent.status.homed:
 		if parent.status.task_state == emc.STATE_ON:
 			utilities.update_home_controls(parent)
+
+		if all(parent.status.homed[:parent.joints]):
+			for item in parent.homed_enabled:
+				getattr(parent, item).setEnabled(True)
+		else:
+			for item in parent.homed_enabled:
+				getattr(parent, item).setEnabled(False)
+
 		parent.homed = parent.status.homed
 
 	# axis position no offsets
