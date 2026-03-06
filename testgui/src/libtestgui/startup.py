@@ -1002,6 +1002,10 @@ def setup_defaults(parent):
 			parent.reload_pb.setEnabled(False)
 		if 'actionReload' in parent.child_names:
 			parent.actionReload.setEnabled(False)
+		if 'actionSave' in parent.child_names:
+			parent.actionSave.setEnabled(False)
+		if 'actionSave_As' in parent.child_names:
+			parent.actionSave_As.setEnabled(False)
 
 
 def setup_tools(parent):

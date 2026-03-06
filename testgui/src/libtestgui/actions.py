@@ -1,6 +1,6 @@
 import subprocess, os, shutil
 
-from PyQt6.QtWidgets import QMenu
+from PyQt6.QtWidgets import QFileDialog, QMenu
 
 import linuxcnc as emc
 
@@ -33,6 +33,11 @@ def load_file(parent, nc_code_file=None):
 		if 'gcode_pte' in parent.child_names:
 			text = open(nc_code_file).read()
 			parent.gcode_pte.setPlainText(text)
+			if 'actionSave' in parent.child_names:
+				parent.actionSave.setEnabled(True)
+			if 'actionSave_As' in parent.child_names:
+				parent.actionSave_As.setEnabled(True)
+
 		if 'file_lb' in parent.child_names:
 			base = os.path.basename(nc_code_file)
 			parent.file_lb.setText(base)
@@ -179,13 +184,26 @@ def action_reload(parent): # actionReload
 		with open(parent.status.file) as f:
 			parent.gcode_pte.setPlainText(f.read())
 
+def action_save(parent): # actionSave
+	text = parent.gcode_pte.toPlainText()
+	nc_code = text.splitlines()
+	with open(parent.status.file, 'w') as f:
+		f.writelines(line + "\n" for line in nc_code)
 
-
-def action_save (parent):
-	pass
-
-def action_save_as (parent):
-	pass
+def action_save_as(parent): # actionSave_As
+	if os.path.isdir(os.path.expanduser('~/linuxcnc/nc_files')):
+		gcode_dir = os.path.expanduser('~/linuxcnc/nc_files')
+	else:
+		gcode_dir = os.path.expanduser('~/')
+	new_nc_code_file, file_type = QFileDialog.getSaveFileName(None,
+	caption="Save As", directory=gcode_dir,
+	filter='G code Files (*.ngc *.NGC);;All Files (*)', options=QFileDialog.Option.DontUseNativeDialog,)
+	if new_nc_code_file:
+		with open(parent.status.file, 'r') as cf:
+			gcode = cf.read()
+		with open(new_nc_code_file, 'w') as f:
+			f.write(gcode)
+		load_file(parent, new_nc_code_file)
 
 def action_edit_tool_table (parent):
 	pass

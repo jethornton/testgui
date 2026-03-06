@@ -19,6 +19,10 @@ RESOURCES
 Open
 Edit
 Reload
+Save
+Save As
+
+Quit
 
 * Machine *
 E Stop
