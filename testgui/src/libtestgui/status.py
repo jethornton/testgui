@@ -63,10 +63,23 @@ def update(parent):
 		if 'interp_state_lb' in parent.child_names: # update the label
 			parent.interp_state_lb.setText(INTERP_STATES[parent.status.interp_state])
 
+		if parent.status.interp_state == emc.INTERP_WAITING:
+			if parent.program_paused:  # running program back from paused
+				for item in parent.program_paused_enable:
+					getattr(parent, item).setEnabled(False)
+				for item in parent.program_running_enable:
+					getattr(parent, item).setEnabled(True)
+				parent.program_paused = False
+
+		if parent.status.interp_state == emc.INTERP_PAUSED: # running program paused
+			parent.program_paused = True
+			for item in parent.program_paused_enable:
+				getattr(parent, item).setEnabled(True)
+			for item in parent.program_running_enable:
+				getattr(parent, item).setEnabled(False)
+
 		if parent.status.interp_state == emc.INTERP_IDLE:
 			utilities.update_run_controls(parent)
-
-
 
 		parent.interp_state = parent.status.interp_state
 
@@ -103,8 +116,19 @@ def update(parent):
 		if 'state_lb' in parent.child_names: # update the label
 			parent.state_lb.setText(STATES[parent.status.state])
 
+		if parent.status.state == emc.RCS_EXEC: # program is running
+			for item in parent.program_running_disabled:
+				getattr(parent, item).setEnabled(False)
+			for item in parent.program_running_enable:
+				getattr(parent, item).setEnabled(True)
+
 		# this is needed for MDI commands that use motion
 		if parent.status.state == emc.RCS_DONE:
+			for item in parent.program_running_disabled:
+				getattr(parent, item).setEnabled(True)
+			for item in parent.program_running_enable:
+				getattr(parent, item).setEnabled(False)
+
 			if parent.status.task_mode == emc.MODE_MDI:
 				utilities.update_mdi(parent)
 			parent.command.mode(emc.MODE_MANUAL)

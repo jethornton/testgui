@@ -48,6 +48,7 @@ def setup_vars(parent):
 	parent.program_units = False
 	parent.g_codes = ()
 	parent.homed = ()
+	parent.program_paused = False
 
 def setup_enables(parent):
 
@@ -139,6 +140,46 @@ def setup_enables(parent):
 	if 'home_all_pb' in parent.child_names:
 		if utilities.home_all_check(parent):
 			parent.state_on_enabled.append('home_all_pb')
+
+	parent.program_running_enable = []
+	for item in ['pause_pb', 'actionPause']:
+		if item in parent.child_names:
+			parent.program_running_enable.append(item)
+
+	parent.program_paused_enable = []
+	for item in ['resume_pb', 'actionResume']:
+		if item in parent.child_names:
+			parent.program_paused_enable.append(item)
+
+	# FIXME might need to remove run_from_line_pb and actionRun_From_Line if not configured correctly
+	parent.program_running_disable = ['open_pb', 'reload_pb', 'run_pb',
+	'run_from_line_pb', 'step_pb', 'jog_selected_plus', 'jog_selected_minus',
+	'resume_pb', 'run_mdi_pb', 'home_all_pb', 'actionRun', 'actionOpen',
+	'menuRecent', 'actionReload', 'actionRun_From_Line', 'actionStep',
+	'actionResume', 'unhome_all_pb', 'tool_change_pb']
+
+	for i in range(9):
+		parent.program_running_disable.append(f'home_pb_{i}')
+		parent.program_running_disable.append(f'unhome_pb_{i}')
+
+	for i in range(100):
+		parent.program_running_disable.append(f'tool_change_pb_{i}')
+
+	for i in range(1, 10):
+		parent.program_running_disable.append(f'change_cs_{i}')
+
+	for item in AXES:
+		parent.program_running_disable.append(f'touchoff_pb_{item}')
+		parent.program_running_disable.append(f'tool_touchoff_{item}')
+
+	parent.program_running_disable.append('mdi_s_pb')
+
+	# remove any items not found in the gui
+	for item in parent.program_running_disable:
+		if item not in parent.child_names:
+			parent.program_running_disable.remove(item)
+
+
 
 def setup_status(parent):
 	# Actual Position labels no offsets

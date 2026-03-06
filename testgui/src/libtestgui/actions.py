@@ -144,17 +144,23 @@ def action_run_from_line(parent): # actionRun_from_Line
 		selected_block = cursor.blockNumber() # get current block number
 		action_run(parent, selected_block)
 
-def action_step (parent):
-	pass
+def action_step(parent): # actionStep
+	if parent.status.task_state == emc.STATE_ON:
+		if parent.status.task_mode != emc.MODE_AUTO:
+			parent.command.mode(emc.MODE_AUTO)
+			parent.command.wait_complete()
+		parent.command.auto(emc.AUTO_STEP)
 
-def action_pause (parent):
-	pass
+def action_pause(parent): # actionPause
+	if parent.status.task_mode == emc.MODE_AUTO: # program is running
+		parent.command.auto(emc.AUTO_PAUSE)
 
-def action_resume (parent):
-	pass
+def action_resume(parent): # actionResume
+	if parent.status.paused:
+		parent.command.auto(emc.AUTO_RESUME)
 
-def action_stop (parent):
-	pass
+def action_stop(parent): # actionStop
+	parent.command.abort()
 
 def action_reload (parent):
 	pass

@@ -24,6 +24,10 @@ E Stop
 Power
 Run
 Run From Line
+Step
+Pause
+Resume
+Stop
 
 * Programs *
 Show HAL
