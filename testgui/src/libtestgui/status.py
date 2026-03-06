@@ -46,7 +46,6 @@ def update(parent):
 		#print(f'EXEC STATE: {EXEC_STATES[parent.status.exec_state]}')
 		if 'exec_state_lb' in parent.child_names: # update the label
 			parent.exec_state_lb.setText(EXEC_STATES[parent.status.exec_state])
-		changed = True
 		# FIXME is this needed here?
 		#if parent.status.state == emc.RCS_DONE and parent.status.task_mode == emc.MODE_MDI:
 		#	parent.command.mode(emc.MODE_MANUAL)
@@ -88,7 +87,6 @@ def update(parent):
 		#print(f'INTERPRETER ERRCODE: {INTERPRETER_ERRCODES[parent.status.interpreter_errcode]}')
 		if 'interpreter_errcode_lb' in parent.child_names: # update the label
 			parent.interpreter_errcode_lb.setText(INTERPRETER_ERRCODES[parent.status.interpreter_errcode])
-		changed = True
 
 		parent.interpreter_errcode = parent.status.interpreter_errcode
 
@@ -198,15 +196,6 @@ def update(parent):
 	if parent.homed != parent.status.homed:
 		utilities.update_home_controls(parent)
 		utilities.update_run_controls(parent)
-
-		'''
-		if all(parent.status.homed[:parent.joints]):
-			for item in parent.homed_enabled:
-				getattr(parent, item).setEnabled(True)
-		else:
-			for item in parent.homed_enabled:
-				getattr(parent, item).setEnabled(False)
-		'''
 
 		parent.homed = parent.status.homed
 
