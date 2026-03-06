@@ -283,6 +283,15 @@ def setup_buttons(parent): # connect buttons to functions
 			'The Run From Line button will be disabled.')
 			dialogs.error_msg_ok(parent, msg, 'Configuration Error!')
 
+	if 'edit_pb' in parent.child_names and not parent.editor:
+		del action_buttons['edit_pb']
+		parent.file_edit_items.remove('edit_pb')
+		parent.edit_pb.setEnabled(False)
+		msg = ('The Edit button was found but no\n'
+		'editor was found in the ini file.\n'
+		'The Edit button will be disabled.')
+		dialogs.error_msg_ok(parent, msg, 'Configuration Error')
+
 	for key, value in action_buttons.items():
 		if key in parent.child_names:
 			getattr(parent, key).clicked.connect(partial(getattr(actions, value), parent))
@@ -358,6 +367,15 @@ def setup_actions(parent): # setup menu actions
 			'function without the Code Viewer.\n'
 			'The Run From Line Menu item will be disabled.')
 			dialogs.error_msg_ok(parent, msg, 'Configuration Error!')
+
+	if 'actionEdit' in parent.child_names and not parent.editor:
+		del actions_dict['actionEdit']
+		parent.file_edit_items.remove('actionEdit')
+		parent.actionEdit.setEnabled(False)
+		msg = ('The Edit Menu was found but no\n'
+		'editor was found in the ini file.\n'
+		'The Edit Menu will be disabled.')
+		dialogs.error_msg_ok(parent, msg, 'Configuration Error')
 
 
 	# if an action is found connect it to the function
