@@ -181,6 +181,21 @@ def setup_status(parent):
 			p = p if p is not None else parent.default_precision
 			parent.status_dro[f'{label}'] = [i, p] # add the label, tuple position & precision
 
+def setup_run_controls(parent):
+	file_run_items = ['run_pb', 'run_from_line_pb', 'step_pb', 'run_mdi_pb',
+	'actionRun', 'actionRun_From_Line', 'actionStep', 'tool_change_pb']
+	for item in file_run_items:
+		if item in parent.child_names:
+			parent.run_controls.append(item)
+	for i in range(100):
+		if f'tool_change_pb_{i}' in parent.child_names:
+			parent.run_controls.append(item)
+	for item in AXES:
+		if f'tool_touchoff_{item}' in parent.child_names:
+			parent.run_controls.append(f'tool_touchoff_{item}')
+		if f'touchoff_pb_{item}' in parent.child_names:
+			parent.run_controls.append(f'touchoff_pb_{item}')
+
 def setup_buttons(parent): # connect buttons to functions
 	if 'estop_pb' in parent.child_names:
 		parent.estop_pb.toggled.connect(partial(actions.action_estop, parent))
@@ -201,7 +216,6 @@ def setup_buttons(parent): # connect buttons to functions
 
 	action_buttons = {
 	'run_pb': 'action_run',
-	'run_from_line_pb': 'action_run_from_line',
 	'step_pb': 'action_step',
 	'pause_pb': 'action_pause',
 	'resume_pb': 'action_resume',
@@ -224,6 +238,18 @@ def setup_buttons(parent): # connect buttons to functions
 	'about_pb': 'action_about',
 	'quick_reference_pb': 'action_quick_reference'
 	}
+
+	if 'run_from_line_pb' in parent.child_names:
+		if 'gcode_pte' in parent.child_names:
+			action_buttons['run_from_line_pb'] = 'action_run_from_line'
+		else:
+			parent.run_from_line_pb.setEnabled(False)
+			parent.state_estop_disabled.remove('run_from_line_pb')
+			parent.run_controls.remove('run_from_line_pb')
+			msg = ('The Run From Line button can not\n'
+			'function without the Code Viewer.\n'
+			'The Run From Line button will be disabled.')
+			dialogs.error_msg_ok(parent, msg, 'Configuration Error!')
 
 	for key, value in action_buttons.items():
 		if key in parent.child_names:
@@ -275,7 +301,6 @@ def setup_actions(parent): # setup menu actions
 		'actionE_Stop': 'action_estop',
 		'actionPower': 'action_power',
 		'actionRun': 'action_run',
-		'actionRun_From_Line': 'action_run_from_line',
 		'actionStep': 'action_step',
 		'actionPause': 'action_pause',
 		'actionResume': 'action_resume',
@@ -289,6 +314,19 @@ def setup_actions(parent): # setup menu actions
 		'actionAbout': 'action_about',
 		'actionQuick_Reference': 'action_quick_reference',
 		'actionClear_Live_Plot': 'action_clear_live_plot'}
+
+	if 'actionRun_From_Line' in parent.child_names:
+		if 'gcode_pte' in parent.child_names:
+			actions_dict['actionRun_From_Line'] = 'action_run_from_line'
+		else:
+			parent.actionRun_From_Line.setEnabled(False)
+			parent.state_estop_disabled.remove('actionRun_From_Line')
+			parent.run_controls.remove('actionRun_From_Line')
+			msg = ('The Run From Line Menu item can not\n'
+			'function without the Code Viewer.\n'
+			'The Run From Line Menu item will be disabled.')
+			dialogs.error_msg_ok(parent, msg, 'Configuration Error!')
+
 
 	# if an action is found connect it to the function
 	for key, value in actions_dict.items():
@@ -308,21 +346,6 @@ def setup_actions(parent): # setup menu actions
 			parent.actionClear_MDI_History.setEnabled(False)
 		if 'actionCopy_MDI_History' in parent.child_names:
 			parent.actionCopy_MDI_History.setEnabled(False)
-
-def setup_run_controls(parent):
-	file_run_items = ['run_pb', 'run_from_line_pb', 'step_pb', 'run_mdi_pb',
-	'actionRun', 'actionRun_From_Line', 'actionStep', 'tool_change_pb']
-	for item in file_run_items:
-		if item in parent.child_names:
-			parent.run_controls.append(item)
-	for i in range(100):
-		if f'tool_change_pb_{i}' in parent.child_names:
-			parent.run_controls.append(item)
-	for item in AXES:
-		if f'tool_touchoff_{item}' in parent.child_names:
-			parent.run_controls.append(f'tool_touchoff_{item}')
-		if f'touchoff_pb_{item}' in parent.child_names:
-			parent.run_controls.append(f'touchoff_pb_{item}')
 
 def setup_mdi(parent):
 	# mdi_command_le is required to run mdi commands

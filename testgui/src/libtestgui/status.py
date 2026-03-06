@@ -170,10 +170,9 @@ def update(parent):
 		parent.file = parent.status.file
 
 
-	# **** HOMED CHANGE **** FIXME may not need to test for state on
+	# **** HOMED CHANGE ****
 	if parent.homed != parent.status.homed:
-		if parent.status.task_state == emc.STATE_ON:
-			utilities.update_home_controls(parent)
+		utilities.update_home_controls(parent)
 		utilities.update_run_controls(parent)
 
 		'''

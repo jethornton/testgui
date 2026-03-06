@@ -23,6 +23,7 @@ Edit
 E Stop
 Power
 Run
+Run From Line
 
 * Programs *
 Show HAL
