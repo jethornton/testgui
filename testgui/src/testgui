@@ -78,18 +78,18 @@ class testgui(QMainWindow):
 					'was not found.')
 				dialogs.warn_msg_ok(parent, msg, 'INI Error')
 
-		# get emc states
-		self.exec_state = self.status.exec_state
-		self.interp_state = self.status.interp_state
-		self.interpreter_errcode = self.status.interpreter_errcode
-		self.motion_mode = self.status.motion_mode
-		self.motion_type = self.status.motion_type
-		self.state = self.status.state
-		self.task_mode = self.status.task_mode
-		self.task_state = self.status.task_state
-		self.file = self.status.file
-		self.flood_state = self.status.flood
-		self.mist_state = self.status.mist
+		# set emc states to -0 so they get evaluated in status at least once
+		self.exec_state = -0
+		self.interp_state = -0
+		self.interpreter_errcode = -0
+		self.motion_mode = -0
+		self.motion_type = -0
+		self.state = -0
+		self.task_mode = -0
+		self.task_state = -0
+		self.file = -0
+		self.flood_state = -0
+		self.mist_state = -0
 
 		startup.find_children(self)
 		startup.setup_vars(self)
