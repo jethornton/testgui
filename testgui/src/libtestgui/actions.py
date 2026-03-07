@@ -125,12 +125,17 @@ def action_edit(parent): # actionEdit
 		if dialogs.warn_msg_yes_no(parent, msg, 'No Editor Configured'):
 			select_editor(parent, nc_code_file)
 
-
-def action_estop(parent): # actionEstop
+def action_estop(parent): # actionE_Stop
 	if parent.status.task_state == emc.STATE_ESTOP:
 		parent.command.state(emc.STATE_ESTOP_RESET)
+		if parent.sender().objectName() == 'actionE_Stop':
+			if 'estop_pb' in parent.child_names:
+				parent.estop_pb.setChecked(True)
 	else:
 		parent.command.state(emc.STATE_ESTOP)
+		if parent.sender().objectName() == 'actionE_Stop':
+			if 'estop_pb' in parent.child_names:
+				parent.estop_pb.setChecked(False)
 
 def action_power(parent): # actionPower
 	if parent.status.task_state == emc.STATE_ESTOP_RESET:
@@ -138,8 +143,14 @@ def action_power(parent): # actionPower
 			if parent.override_limits_cb.isChecked():
 				parent.command. override_limits()
 		parent.command.state(emc.STATE_ON)
+		if parent.sender().objectName() == 'actionPower':
+			if 'power_pb' in parent.child_names:
+				parent.power_pb.setChecked(True)
 	else:
 		parent.command.state(emc.STATE_OFF)
+		if parent.sender().objectName() == 'actionPower':
+			if 'power_pb' in parent.child_names:
+				parent.power_pb.setChecked(False)
 
 def action_run(parent, start=0): # actionRun
 	if parent.status.task_mode != emc.MODE_AUTO:
