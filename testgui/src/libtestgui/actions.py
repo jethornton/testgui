@@ -180,7 +180,9 @@ def action_resume(parent): # actionResume
 		parent.command.auto(emc.AUTO_RESUME)
 
 def action_stop(parent): # actionStop
-	parent.command.abort()
+	parent.status.poll()
+	if parent.status.interp_state != emc.INTERP_IDLE:
+		parent.command.abort()
 
 def action_reload(parent): # actionReload
 	if parent.status.task_mode != emc.MODE_MANUAL:
@@ -240,11 +242,11 @@ def action_save_mdi (parent):
 def action_show_hal (parent): # actionShow_HAL
 	subprocess.Popen('halshow', cwd=parent.config_path)
 
-def action_hal_meter (parent):
-	pass
+def action_hal_meter(parent): # actionHal_Meter
+	subprocess.Popen('halmeter', cwd=parent.config_path)
 
-def action_hal_scope (parent):
-	pass
+def action_hal_scope(parent): # actionHal_Scope
+	subprocess.Popen('halscope', cwd=parent.config_path)
 
 def action_about (parent):
 	pass
