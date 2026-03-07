@@ -137,6 +137,8 @@ def action_estop(parent): # actionE_Stop
 		if parent.sender().objectName() == 'actionE_Stop':
 			if 'estop_pb' in parent.child_names:
 				parent.estop_pb.setChecked(False)
+		if 'power_pb' in parent.child_names:
+			parent.power_pb.setChecked(False)
 
 def action_power(parent): # actionPower
 	if parent.status.task_state == emc.STATE_ESTOP_RESET:
