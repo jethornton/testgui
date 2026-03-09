@@ -206,6 +206,9 @@ def update_run_controls(parent):
 
 def set_hal_enables(parent, obj):
 	obj_name = obj.objectName()
+	print(obj_name)
+	if obj_name == 'probing_enable_pb':
+		return
 	always_on = obj.property('always_on')
 	state_on = obj.property('state_on')
 	all_homed = obj.property('all_homed')
