@@ -1044,6 +1044,7 @@ def setup_probing(parent):
 				parent.probing_enable_pb.setCheckable(True)
 			parent.probing_enable_pb.toggled.connect(partial(probe.toggle, parent))
 			parent.state_estop_disabled.append('probing_enable_pb')
+			parent.state_estop_reset_disabled.append('probing_enable_pb')
 			parent.homed_enabled.append('probing_enable_pb')
 
 def setup_defaults(parent):
