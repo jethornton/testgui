@@ -180,6 +180,7 @@ def update(parent):
 			for item in parent.state_on_enabled:
 				getattr(parent, item).setEnabled(True)
 
+		utilities.update_home_controls(parent)
 		utilities.update_run_controls(parent)
 
 		parent.task_state = parent.status.task_state

@@ -44,7 +44,7 @@ def find_children(parent): # get the object names of all widgets
 def setup_vars(parent):
 	parent.program_units = False
 	parent.g_codes = ()
-	parent.homed = ()
+	parent.homed = parent.status.homed
 	parent.program_paused = False
 	parent.motion_line = -1
 	parent.plot_units = False
@@ -136,11 +136,6 @@ def setup_enables(parent):
 			parent.state_on_enabled.append(f'jog_plus_pb_{i}')
 		if f'jog_minus_pb_{i}' in parent.child_names:
 			parent.state_on_enabled.append(f'jog_minus_pb_{i}')
-		if f'home_pb_{i}' in parent.child_names:
-			parent.state_on_enabled.append(f'home_pb_{i}')
-	if 'home_all_pb' in parent.child_names:
-		if utilities.home_all_check(parent):
-			parent.state_on_enabled.append('home_all_pb')
 
 	parent.program_running_enable = []
 	for item in ['pause_pb', 'actionPause']:
