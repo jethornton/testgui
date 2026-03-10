@@ -173,6 +173,8 @@ def update(parent):
 				getattr(parent, item).setEnabled(False)
 			for item in parent.state_estop_reset_enabled:
 				getattr(parent, item).setEnabled(True)
+			if 'probing_enable_pb' in parent.child_names:
+				parent.probing_enable_pb.setChecked(False)
 
 		# estop closed power on
 		if parent.status.task_state == emc.STATE_ON:
