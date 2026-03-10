@@ -185,7 +185,7 @@ def update_home_controls(parent):
 				getattr(parent, item).setEnabled(False)
 
 def update_run_controls(parent):
-	#print('update_run_controls')
+	parent.status.poll()
 	if parent.status.task_mode == emc.MODE_MANUAL:
 		if not parent.probing:
 			for item in parent.file_load_controls:
