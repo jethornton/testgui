@@ -238,7 +238,7 @@
     <item row="3" column="3" rowspan="2" colspan="5">
      <widget class="QTabWidget" name="tabWidget_6">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -683,33 +683,7 @@
         <string>Probe</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_19">
-        <item row="1" column="0">
-         <widget class="QPushButton" name="probe_1">
-          <property name="text">
-           <string>Probe 1</string>
-          </property>
-          <property name="function" stdset="0">
-           <string>mdi</string>
-          </property>
-          <property name="command" stdset="0">
-           <string>o&lt;measure&gt; call</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="probing_enable_pb">
-          <property name="text">
-           <string>Probe Enable</string>
-          </property>
-          <property name="function" stdset="0">
-           <string>hal_pin</string>
-          </property>
-          <property name="pin_name" stdset="0">
-           <string>probe-enable</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
+        <item row="0" column="2">
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -722,7 +696,7 @@
           </property>
          </spacer>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="1">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -734,6 +708,60 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="title">
+           <string>Probing</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_20">
+           <item row="0" column="0">
+            <widget class="QPushButton" name="probing_enable_pb">
+             <property name="text">
+              <string>Probe Enable</string>
+             </property>
+             <property name="function" stdset="0">
+              <string>hal_pin</string>
+             </property>
+             <property name="pin_name" stdset="0">
+              <string>probe-enable</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="probe_1">
+             <property name="text">
+              <string>Probe 1</string>
+             </property>
+             <property name="function" stdset="0">
+              <string>mdi</string>
+             </property>
+             <property name="command" stdset="0">
+              <string>o&lt;measure&gt; call</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="title">
+           <string>Parameters</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_21">
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+             <property name="function" stdset="0">
+              <string>set_var</string>
+             </property>
+             <property name="variable" stdset="0">
+              <string>1000</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
